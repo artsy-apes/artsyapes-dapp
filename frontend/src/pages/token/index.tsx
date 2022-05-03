@@ -7,6 +7,7 @@ import {LoadingCircle} from "./components/LoadingCircle";
 import * as query from "../../contract/query";
 import {PageNotExists} from "../../components/shared/PageNotExists";
 import {PanelGrid} from "./components/PanelGrid";
+import {OrderModal} from "./components/OrderModal";
 
 
 type Nullable<T> = T | null | undefined;
@@ -27,8 +28,12 @@ export const TokenBase = (props: TokenProps) => {
   const [imageName, setImageName] = useState<any>("")
   const [notValidId, setNotValidId] = useState(false);
 
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const toggleModal = () => setShowOrderModal(!showOrderModal);
+
+
   useEffect( () => {
-    const tryReadToken = async () :Promise<any> => {
+    const tryReadTokenId = async () :Promise<any> => {
       if(globalContext.tokens !== undefined && tokenId === null){
         const token_id = window.location.pathname.replace( /^\D+/g, '');
         if(!/^\d+$/.test(token_id) || parseInt(token_id) <= 0 || parseInt(token_id) >= 3778){
@@ -39,7 +44,7 @@ export const TokenBase = (props: TokenProps) => {
         setTokenId(token);
       }
     }
-    tryReadToken()
+    tryReadTokenId()
   }, [globalContext.tokens])
 
   useEffect( () => {
@@ -98,34 +103,38 @@ export const TokenBase = (props: TokenProps) => {
   return (
     <div className={className}>
       { nftInfo !== undefined ? (
-        <Container fluid>
-            <Row>
-              <Col
-                  xl={{span: 5}}
-                  lg={{span: 5}}
-                  md={{span: 12}}
-                  xs={{span: 12}} className="col-image">
-                <div className="token-image">
-                  <img src={imageName} />
-                </div>
-              </Col>
-              <Col
-                  xl={{span: 7}}
-                  lg={{span: 7}}
-                  md={{span: 12}}
-                  xs={{span: 12}} className="d-flex flex-wrap flex-column col-info">
-                <div className="token-header">
-                  <h2 className="image-name">{nftInfo.info.extension.name}</h2>
-                  <span >Owned by <a href={`https://terrasco.pe/mainnet/address/${nftInfo.access.owner}`} target="_blank" rel="noreferrer noopener">{nftInfo.access.owner}</a></span>
-                </div>
-                <PanelGrid className="mt-4" title={"Physicals"} items={physical_info}/>
-                <PanelGrid className="mt-4" title={"Traits"} items={traits()}/>
-                <Button
-                    variant="light"
-                    className={`btn-order mt-3 ${!isOwner() ? "disabled" : ""}`}>Order Physical Item</Button>
-              </Col>
-            </Row>
-        </Container>
+        <>
+          <Container fluid>
+              <Row>
+                <Col
+                    xl={{span: 5}}
+                    lg={{span: 5}}
+                    md={{span: 12}}
+                    xs={{span: 12}} className="col-image">
+                  <div className="token-image">
+                    <img src={imageName} />
+                  </div>
+                </Col>
+                <Col
+                    xl={{span: 7}}
+                    lg={{span: 7}}
+                    md={{span: 12}}
+                    xs={{span: 12}} className="d-flex flex-wrap flex-column col-info">
+                  <div className="token-header">
+                    <h2 className="image-name">{nftInfo.info.extension.name}</h2>
+                    <span >Owned by <a href={`https://terrasco.pe/mainnet/address/${nftInfo.access.owner}`} target="_blank" rel="noreferrer noopener">{nftInfo.access.owner}</a></span>
+                  </div>
+                  <PanelGrid className="mt-4" title={"Physicals"} items={physical_info}/>
+                  <PanelGrid className="mt-4" title={"Traits"} items={traits()}/>
+                  <Button
+                      variant="light"
+                      onClick={toggleModal}
+                      className={`btn-order mt-3 ${!isOwner() ? "disabled" : ""}`}>Order Physical Item</Button>
+                </Col>
+              </Row>
+          </Container>
+          <OrderModal show={showOrderModal} toggleModal={toggleModal}/>
+        </>
       ) : (
           (notValidId) ? <PageNotExists/> : <LoadingCircle/>
       )
