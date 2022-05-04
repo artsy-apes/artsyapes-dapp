@@ -219,7 +219,6 @@ export const Token = styled(TokenBase)`
           background-color: rgba(218,165,32, .9);
           color: white;
           &.disabled {
-            pointer-events: unset;
             cursor: not-allowed;
           }
           &:hover {
